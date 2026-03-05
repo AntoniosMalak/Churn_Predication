@@ -53,9 +53,9 @@ def main():
         X, y, 
         model_dir=str(model_dir),
         use_validation=False,              # Train/test only (no validation split)
-        imbalance_strategy='class_weight', # Handle class imbalance with class weights
-        use_cross_validation=True,         # cross-validation
-        use_grid_search=False,             # grid search
+        imbalance_strategy='undersampling',     # Handle class imbalance with class weights
+        use_cross_validation=True,        # cross-validation
+        use_grid_search=True,              # grid search
         grid_search_params=None            # Custom hyperparameters dict
     )
     
@@ -66,6 +66,12 @@ def main():
     print(f"\nBest Model: {test_results['model_name']}")
     print(f"ROC-AUC Score: {test_results['roc_auc']:.4f}")
     print(f"F1-Score: {test_results['f1']:.4f}")
+    if 'train_results' in test_results:
+        print(f"Train ROC-AUC: {test_results['train_results']['roc_auc']:.4f}")
+        print(f"Train F1-Score: {test_results['train_results']['f1']:.4f}")
+    if 'fit_assessment' in test_results:
+        print(f"Fit Status: {test_results['fit_assessment']['status']}")
+        print(f"Fit Detail: {test_results['fit_assessment']['reason']}")
     print(f"\nModels saved to: {model_dir}")
     
     return 0

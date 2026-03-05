@@ -291,17 +291,21 @@ class ModelTrainer:
         elif model_type == 'random_forest':
             base_model = RandomForestClassifier(random_state=self.random_state, class_weight='balanced', n_jobs=-1)
             default_grid = {
-                'n_estimators': [50, 100, 200],
-                'max_depth': [10, 15, 20],
-                'min_samples_split': [5, 10]
+                'n_estimators': [3, 5, 10],
+                'max_depth': [3, 4, 5],
+                'min_samples_split': [3, 4, 5]
             }
         
         elif model_type == 'xgboost':
             base_model = xgb.XGBClassifier(random_state=self.random_state, eval_metric='logloss')
             default_grid = {
-                'n_estimators': [50, 100],
-                'max_depth': [5, 7, 9],
-                'learning_rate': [0.01, 0.1]
+                'n_estimators': [5, 10, 15, 50, 100],
+                'max_depth': [3, 4, 5, 6],
+                'learning_rate': [0.01, 0.1, 0.001],
+                'subsample': [0.7, 0.8, 0.9],
+                'colsample_bytree': [0.6, 0.7, 0.8, 0.9],
+                'reg_alpha': [0, 0.01, 0.1, 1], # L1
+                # 'reg_lambda': [0.1, 1, 5, 10], # L2
             }
         
         else:
@@ -388,7 +392,6 @@ class ModelTrainer:
             n_estimators=100,
             max_depth=7,
             learning_rate=0.1,
-            early_stopping_rounds=10,
             random_state=self.random_state,
             scale_pos_weight=sum(y_train == 0) / sum(y_train == 1),  # Weight minority class
             eval_metric='logloss'
