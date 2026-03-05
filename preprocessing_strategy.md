@@ -306,7 +306,3 @@ trainer, results = train_pipeline(
 | `model_training.py` | `grid_search_hyperparameters()` | Hyperparameter tuning |
 | `model_training.py` | `train_pipeline()` | Orchestrate full pipeline |
 
----
-
-**Last Updated:** 2026-03-05
-**Pipeline Version:** 2.1 (with imbalance handling and flexible validation)
