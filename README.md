@@ -6,7 +6,7 @@ A complete machine learning engineering solution for predicting customer churn i
 
 **Objective:** Build a predictive model that identifies customers likely to churn (not make a purchase) within the next 90 days.
 
-**Dataset:** Kaggle Bank Customer Churn dataset (~10,000 records, 20.4% churn rate)
+**Dataset:** Kaggle Bank Customer Churn dataset (~10,000 records, 20.4% churn rate) datasetlinki[https://www.kaggle.com/datasets/shantanudhakadd/bank-customer-churn-prediction]
 
 **Approach:** Multi-model comparison with rigorous validation, comprehensive feature engineering, and production considerations.
 
