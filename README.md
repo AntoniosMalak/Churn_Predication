@@ -434,7 +434,7 @@ Reproducibility guaranteed by fixed `random_state` in all algorithms, stratified
 | Issue | Fix |
 |-------|-----|
 | `ModuleNotFoundError: xgboost` | `pip install xgboost` |
-| `FileNotFoundError: Churn_Modelling.csv` | Download from [Kaggle](https://www.kaggle.com/datasets/shratisaxena/churn-modelling), place in `data/` |
+| `FileNotFoundError: Churn_Modelling.csv` | Download from [Kaggle](https://www.kaggle.com/datasets/shantanudhakadd/bank-customer-churn-prediction), place in `data/` |
 | `ImportError: imblearn` | `pip install imbalanced-learn` |
 | Out of memory | Use `imbalance_strategy='class_weight'` |
 | Grid search too slow | Reduce `cv_folds=2` or narrow the param grid |
@@ -451,13 +451,3 @@ Reproducibility guaranteed by fixed `random_state` in all algorithms, stratified
 | `CHANGES.md` | Changelog and migration guide |
 | `preprocessing_strategy.md` | Data leakage prevention deep dive |
 | `examples.py` | 7 ready-to-run usage examples |
-
----
-
-## References
-
-- [Preventing Data Leakage](https://towardsdatascience.com/data-leakage-in-machine-learning-10bdd3eec742)
-- [Handling Class Imbalance](https://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-machine-learning/)
-- [Cross-Validation Guide](https://scikit-learn.org/stable/modules/cross_validation.html)
-- [Grid Search Tuning](https://scikit-learn.org/stable/modules/grid_search.html)
-- [Kaggle Churn Dataset](https://www.kaggle.com/datasets/shantanudhakadd/bank-customer-churn-prediction)
