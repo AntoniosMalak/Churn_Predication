@@ -476,7 +476,7 @@ class ModelTrainer:
         path = os.path.join(self.model_dir, f"best_model_{self.best_model_name}.pkl")
         with open(path, 'wb') as f:
             pickle.dump(self.best_model, f)
-        print(f"[OK] Model saved to {path}")
+        print(f"Model saved to {path}")
     
     def load_best_model(self, model_name: str = None):
         """Load a previously saved model.

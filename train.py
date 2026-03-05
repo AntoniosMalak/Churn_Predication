@@ -5,10 +5,12 @@ Run this to load data, build features, and train models.
 
 import sys
 from pathlib import Path
+# Add the src folder to the path, so we can import everything properly
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from src.data_ingestion import load_and_validate
-from src.feature_engineering import prepare_data
-from src.model_training import train_pipeline
+from data_ingestion import load_and_validate
+from feature_engineering import prepare_data
+from model_training import train_pipeline
 
 
 def main():
@@ -43,6 +45,7 @@ def main():
     # Step 3: Train and evaluate models
     print("\n" + "="*60)
     print("STEP 3: TRAINING MODELS")
+    print("  logistic_regression\n  random_forest\n  xgboost")
     print("="*60)
     
     # Training configuration
@@ -51,7 +54,7 @@ def main():
         model_dir=str(model_dir),
         use_validation=False,              # Train/test only (no validation split)
         imbalance_strategy='class_weight', # Handle class imbalance with class weights
-        use_cross_validation=False,        # cross-validation
+        use_cross_validation=True,         # cross-validation
         use_grid_search=False              # grid search
     )
     
