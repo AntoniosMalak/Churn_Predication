@@ -150,7 +150,6 @@ MainFolder/
 ├── train.py                             # Run this to train
 ├── README.md                            # This file
 ├── WRITEUP.md                           # Detailed technical explanation
-├── CHANGES.md                           # Changelog
 ├── preprocessing_strategy.md            # Deep dive: preprocessing & leakage prevention
 ├── requirements.txt
 │
@@ -448,6 +447,5 @@ Reproducibility guaranteed by fixed `random_state` in all algorithms, stratified
 |------|---------|
 | `README.md` | Overview, results, usage (this file) |
 | `WRITEUP.md` | Detailed technical explanation |
-| `CHANGES.md` | Changelog and migration guide |
 | `preprocessing_strategy.md` | Data leakage prevention deep dive |
 | `examples.py` | 7 ready-to-run usage examples |
