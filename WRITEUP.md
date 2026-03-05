@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document provides a comprehensive write-up of the three major components of the customer churn prediction ML engineering take-home project:
+This document provides a comprehensive write-up of the three major components of the customer churn prediction:
 
 1. **Data Acquisition & Engineering:** How we selected and prepared data
 2. **Modeling:** How we trained, evaluated, and compared models
