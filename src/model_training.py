@@ -712,7 +712,6 @@ def train_pipeline(X: np.ndarray, y: np.ndarray, model_dir: str = "models", engi
             print(f"\nWinner: {trainer.best_model_name} (ROC-AUC: {best_score:.4f})")
         else:
             print("\nNo validation set provided - using training data for model selection")
-            print("(Note: In production, this is not recommended without cross-validation)")
             for model_name in ['logistic_regression', 'random_forest', 'xgboost']:
                 trainer.results[model_name] = trainer.evaluate_model(
                     trainer.models[model_name], X_train_balanced, y_train_balanced, model_name.replace('_', ' ').title()
