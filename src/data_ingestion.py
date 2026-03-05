@@ -1,6 +1,5 @@
 """
-Data loading and validation for the churn prediction pipeline.
-Basically: Load CSV, check if it looks reasonable, give you a heads up if something's off.
+Data loading and validation for the churn pipeline.
 """
 
 import pandas as pd
@@ -11,30 +10,30 @@ from typing import Tuple, Dict, Any
 
 
 class DataIngestion:
-    """Simple class to load and validate customer data."""
+    """Load and validate customer data."""
     
     def __init__(self, data_path: str):
-        """Set up the data loader.
+        """Initialize the data loader.
         
         Args:
-            data_path: Path to your CSV file with customer data
+            data_path: Path to the CSV file
         """
         self.data_path = data_path
         self.df = None
         self.data_quality_report = {}
     
     def load_data(self) -> pd.DataFrame:
-        """Load the CSV and make sure it's not broken.
+        """Load and validate the CSV file.
         
         Returns:
-            Your data as a DataFrame
+            DataFrame with the data
             
         Raises:
-            FileNotFoundError: Oops, file doesn't exist
-            ValueError: File is empty or something's wrong
+            FileNotFoundError: File does not exist
+            ValueError: File is empty or has an issue
         """
         if not os.path.exists(self.data_path):
-            raise FileNotFoundError(f"Can't find data file: {self.data_path}")
+            raise FileNotFoundError(f"Data file not found: {self.data_path}")
         
         self.df = pd.read_csv(self.data_path)
         
@@ -46,7 +45,7 @@ class DataIngestion:
     
     def validate_data(self) -> Dict[str, Any]:
         """
-        Perform data validation checks.
+        Validate the data quality and report issues.
         
         Returns:
             Dictionary with validation results and warnings
@@ -80,7 +79,7 @@ class DataIngestion:
         return report
     
     def _check_target_distribution(self) -> Dict[str, float]:
-        """Check the distribution of the target variable (Exited)."""
+        """Check the distribution of the target variable."""
         if 'Exited' in self.df.columns:
             dist = self.df['Exited'].value_counts().to_dict()
             pct = (self.df['Exited'].value_counts(normalize=True) * 100).to_dict()
@@ -103,10 +102,10 @@ class DataIngestion:
     
     def get_column_info(self) -> pd.DataFrame:
         """
-        Get information about columns (names, types, non-null counts).
+        Get information about each column.
         
         Returns:
-            DataFrame with column information
+            DataFrame with column details
         """
         if self.df is None:
             raise ValueError("Data not loaded. Call load_data() first.")
@@ -123,9 +122,8 @@ class DataIngestion:
         Handle missing values in the dataset.
         
         Args:
-            strategy: 'drop' to remove rows with missing values,
-                     'mean' to fill numerical columns with mean,
-                     'median' to fill numerical columns with median
+            strategy: 'drop' to remove rows, 'mean' to fill with average,
+                     'median' to fill with middle value
         
         Returns:
             DataFrame with missing values handled
@@ -159,14 +157,14 @@ class DataIngestion:
         Get the current dataframe.
         
         Returns:
-            Current DataFrame
+            DataFrame
         """
         return self.df
 
 
 def load_and_validate(data_path: str) -> pd.DataFrame:
     """
-    Convenience function to load and validate data in one step.
+    Load and validate data in one function.
     
     Args:
         data_path: Path to the CSV file

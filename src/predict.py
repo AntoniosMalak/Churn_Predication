@@ -39,7 +39,7 @@ class ChurnPredictor:
         self._load_artifacts()
     
     def _load_artifacts(self):
-        """Grab the model and preprocessor from disk."""
+        """Load the model and preprocessor from disk."""
         # Load preprocessor
         preprocessor_path = os.path.join(self.model_dir, "preprocessor.pkl")
         if not os.path.exists(preprocessor_path):
@@ -51,8 +51,8 @@ class ChurnPredictor:
         self.feature_engineer = FeatureEngineer(model_dir=self.model_dir)
         self.feature_engineer.preprocessor = preprocessor
         
-        # Try to find whichever model was trained
-        # (Ideally we trained XGBoost, but could be any of these)
+        # Find the trained model
+        # (Ideally XGBoost, but could be another type)
         model_names = ['best_model_xgboost.pkl', 'best_model_random_forest.pkl', 'best_model_logistic_regression.pkl']
         model_path = None
         
@@ -72,13 +72,13 @@ class ChurnPredictor:
         print(f"✓ Loaded preprocessor from {preprocessor_path}")
     
     def predict_single(self, customer_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Score one customer. Is this person likely to churn?
+        """Make a prediction for a single customer.
         
         Args:
-            customer_data: Customer info (age, tenure, balance, etc.)
+            customer_data: Customer information (age, tenure, balance, etc.)
             
         Returns:
-            Dict with prediction and confidence
+            Dictionary with prediction and confidence"""
         """
         # Make sure we have all the required info
         required_fields = ['Age', 'CreditScore', 'Geography', 'Gender', 'Tenure', 
@@ -99,7 +99,7 @@ class ChurnPredictor:
         if 'Surname' not in df.columns:
             df['Surname'] = 'Unknown'
         
-        # Apply feature engineering (age groups, balance checks, etc.)
+        # Apply the features that were engineered during training
         df_engineered = self.feature_engineer.engineer_features(df)
         
         # Remove columns we don't need for prediction
@@ -109,14 +109,14 @@ class ChurnPredictor:
         if 'Exited' in df_engineered.columns:
             df_engineered = df_engineered.drop(columns=['Exited'])
         
-        # Scale/encode the features
+        # Scale and encode the features
         try:
             X_transformed = self.feature_engineer.transform_features(df_engineered)
         except Exception as e:
             print(f"⚠ Error during feature transformation: {e}")
             raise
         
-        # Run through the model
+        # Get the prediction from the model
         churn_probability = self.model.predict_proba(X_transformed)[0, 1]
         predicted_churn = (churn_probability >= 0.5).astype(int)
         
@@ -130,13 +130,13 @@ class ChurnPredictor:
         return result
     
     def predict_batch(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Score multiple customers at once.
+        """Make predictions for multiple customers.
         
         Args:
             df: DataFrame with customer data (multiple rows)
             
         Returns:
-            Same DataFrame but with prediction columns added
+            DataFrame with predictions added"""
         """
         predictions = []
         
@@ -146,7 +146,7 @@ class ChurnPredictor:
                 predictions.append(pred)
             except Exception as e:
                 print(f"⚠ Error predicting for row {idx}: {e}")
-                # Still add something so the row doesn't get lost
+                # Add a record so we don't lose the row
                 predictions.append({
                     'churn_probability': np.nan,
                     'predicted_churn': np.nan,
@@ -195,33 +195,33 @@ def load_input_data(input_path: str) -> pd.DataFrame:
 
 
 def main():
-    """CLI for making predictions. Run with --help to see options."""
+    """Command-line interface for making predictions."""
     parser = argparse.ArgumentParser(
-        description='🔮 Predict which customers might churn'
+        description='Make predictions with the trained churn model'
     )
     parser.add_argument('--input', required=True, help='Input file (JSON or CSV)')
     parser.add_argument('--output', default=None, help='Save predictions here (optional)')
-    parser.add_argument('--model_dir', default='models', help='Where the model lives')
+    parser.add_argument('--model_dir', default='models', help='Directory with the trained model')
     
     args = parser.parse_args()
     
     try:
         # Load the data
-        print(f"📂 Loading data from {args.input}...")
+        print(f"Loading data from {args.input}...")
         df = load_input_data(args.input)
         print(f"✓ Loaded {len(df)} customer records\n")
         
         # Set up the predictor
-        print(f"🔧 Initializing model from {args.model_dir}...")
+        print(f"Initialize model from {args.model_dir}...")
         predictor = ChurnPredictor(model_dir=args.model_dir)
         
         # Make predictions
-        print(f"\n🎯 Making predictions...\n")
+        print(f"\nMaking predictions...\n")
         predictions_df = predictor.predict_batch(df)
         
         # Show results
         print("=" * 70)
-        print("🎯 PREDICTIONS")
+        print("PREDICTIONS")
         print("=" * 70)
         display_cols = ['Age', 'Geography', 'Tenure', 'Balance', 'IsActiveMember', 
                        'churn_probability', 'churn_risk']
@@ -230,22 +230,21 @@ def main():
         
         # Summary
         print("\n" + "=" * 70)
-        print("📊 SUMMARY")
+        print("SUMMARY")
         print("=" * 70)
         churn_count = (predictions_df['predicted_churn'] == 1).sum()
         print(f"Total customers: {len(predictions_df)}")
         print(f"Predicted to churn: {churn_count} ({churn_count/len(predictions_df)*100:.1f}%)")
-        print(f"Avg churn risk: {predictions_df['churn_probability'].mean():.1%}")
+        print(f"Average churn probability: {predictions_df['churn_probability'].mean():.1%}")
         
-        # Save if user wants
         if args.output:
             predictions_df.to_csv(args.output, index=False)
-            print(f"\n✓ Saved to {args.output}")
+            print(f"\n✓ Predictions saved to {args.output}")
         
         return 0
     
     except Exception as e:
-        print(f"❌ Error: {e}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         return 1
 
 
