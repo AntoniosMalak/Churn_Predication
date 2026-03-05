@@ -52,7 +52,6 @@ class ChurnPredictor:
         self.feature_engineer.preprocessor = preprocessor
         
         # Find the trained model
-        # (Ideally XGBoost, but could be another type)
         model_names = ['best_model_xgboost.pkl', 'best_model_random_forest.pkl', 'best_model_logistic_regression.pkl']
         model_path = None
         
@@ -68,8 +67,8 @@ class ChurnPredictor:
         with open(model_path, 'rb') as f:
             self.model = pickle.load(f)
         
-        print(f"✓ Loaded model from {model_path}")
-        print(f"✓ Loaded preprocessor from {preprocessor_path}")
+        print(f"Loaded model from {model_path}")
+        print(f"Loaded preprocessor from {preprocessor_path}")
     
     def predict_single(self, customer_data: Dict[str, Any]) -> Dict[str, Any]:
         """Make a prediction for a single customer.
@@ -78,7 +77,7 @@ class ChurnPredictor:
             customer_data: Customer information (age, tenure, balance, etc.)
             
         Returns:
-            Dictionary with prediction and confidence"""
+            Dictionary with prediction and confidence
         """
         # Make sure we have all the required info
         required_fields = ['Age', 'CreditScore', 'Geography', 'Gender', 'Tenure', 
@@ -113,7 +112,7 @@ class ChurnPredictor:
         try:
             X_transformed = self.feature_engineer.transform_features(df_engineered)
         except Exception as e:
-            print(f"⚠ Error during feature transformation: {e}")
+            print(f"WARNING: Error during feature transformation: {e}")
             raise
         
         # Get the prediction from the model
@@ -123,7 +122,7 @@ class ChurnPredictor:
         result = {
             'churn_probability': float(churn_probability),
             'predicted_churn': int(predicted_churn),
-            'churn_risk': 'High ⚠️' if predicted_churn == 1 else 'Low ✓',
+            'churn_risk': 'High Risk' if predicted_churn == 1 else 'Low Risk',
             'confidence': float(max(churn_probability, 1 - churn_probability))
         }
         
@@ -136,7 +135,7 @@ class ChurnPredictor:
             df: DataFrame with customer data (multiple rows)
             
         Returns:
-            DataFrame with predictions added"""
+            DataFrame with predictions added
         """
         predictions = []
         
@@ -145,7 +144,7 @@ class ChurnPredictor:
                 pred = self.predict_single(row.to_dict())
                 predictions.append(pred)
             except Exception as e:
-                print(f"⚠ Error predicting for row {idx}: {e}")
+                print(f"WARNING: Error predicting for row {idx}: {e}")
                 # Add a record so we don't lose the row
                 predictions.append({
                     'churn_probability': np.nan,
@@ -209,7 +208,7 @@ def main():
         # Load the data
         print(f"Loading data from {args.input}...")
         df = load_input_data(args.input)
-        print(f"✓ Loaded {len(df)} customer records\n")
+        print(f"Loaded {len(df)} customer records\n")
         
         # Set up the predictor
         print(f"Initialize model from {args.model_dir}...")
@@ -239,7 +238,7 @@ def main():
         
         if args.output:
             predictions_df.to_csv(args.output, index=False)
-            print(f"\n✓ Predictions saved to {args.output}")
+            print(f"\nPredictions saved to {args.output}")
         
         return 0
     
