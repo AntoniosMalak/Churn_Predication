@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import os
 from pathlib import Path
-from typing import Tuple, Dict, Any
+from typing import Dict, Any
 
 
 class DataIngestion:
@@ -40,7 +40,7 @@ class DataIngestion:
         if self.df.empty:
             raise ValueError("Data file is empty")
         
-        print(f"✓ Loaded {len(self.df)} records with {len(self.df.columns)} columns")
+        print(f"Loaded {len(self.df)} records with {len(self.df.columns)} columns")
         return self.df
     
     def validate_data(self) -> Dict[str, Any]:
@@ -117,13 +117,17 @@ class DataIngestion:
             'null_count': self.df.isnull().sum().values
         })
     
-    def handle_missing_values(self, strategy: str = 'drop') -> pd.DataFrame:
+    def handle_missing_values(self, strategy: str = 'drop', gap: float = 10) -> pd.DataFrame:
         """
         Handle missing values in the dataset.
         
         Args:
             strategy: 'drop' to remove rows, 'mean' to fill with average,
-                     'median' to fill with middle value
+                     'median' to fill with middle value, or 'best' to automatically
+                     select best method based on data distribution
+            gap: Threshold (as percentage) to detect outliers. If gap between mean 
+                 and median is less than this, use mean. Otherwise use median for 
+                 numeric columns and mode for categorical
         
         Returns:
             DataFrame with missing values handled
@@ -148,6 +152,36 @@ class DataIngestion:
             numeric_cols = df_copy.select_dtypes(include=[np.number]).columns
             df_copy[numeric_cols] = df_copy[numeric_cols].fillna(df_copy[numeric_cols].median())
             print(f"Filled numeric columns with median values")
+        
+        elif strategy == 'best':
+            numeric_cols = df_copy.select_dtypes(include=[np.number]).columns
+            categorical_cols = df_copy.select_dtypes(include=['object', 'category']).columns
+            
+            print(f"Using best strategy (gap threshold: {gap}%)")
+            
+            # Fill numeric columns intelligently
+            for col in numeric_cols:
+                if df_copy[col].isnull().sum() > 0:
+                    mean_val = df_copy[col].mean()
+                    median_val = df_copy[col].median()
+                    
+                    # Calculate gap between mean and median as percentage
+                    gap_pct = abs(mean_val - median_val) / median_val * 100 if median_val != 0 else 0
+                    
+                    if gap_pct <= gap:
+                        df_copy[col].fillna(mean_val, inplace=True)
+                        print(f"  {col}: filled with mean (gap: {gap_pct:.1f}%)")
+                    else:
+                        df_copy[col].fillna(median_val, inplace=True)
+                        print(f"  {col}: filled with median (gap: {gap_pct:.1f}%)")
+            
+            # Fill categorical columns with mode
+            for col in categorical_cols:
+                if df_copy[col].isnull().sum() > 0:
+                    mode_vals = df_copy[col].mode()
+                    mode_val = mode_vals[0] if len(mode_vals) > 0 else 'Unknown'
+                    df_copy[col].fillna(mode_val, inplace=True)
+                    print(f"  {col}: filled with mode ('{mode_val}')")
         
         self.df = df_copy
         return self.df
@@ -175,13 +209,12 @@ def load_and_validate(data_path: str) -> pd.DataFrame:
     ingestion = DataIngestion(data_path)
     ingestion.load_data()
     ingestion.validate_data()
-    ingestion.handle_missing_values(strategy='mean')
+    ingestion.handle_missing_values(strategy='best')
     
     return ingestion.get_data()
 
 
 if __name__ == "__main__":
-    # Example usage
     data_path = Path(__file__).parent.parent / "data" / "Churn_Modelling.csv"
     ingestion = DataIngestion(str(data_path))
     ingestion.load_data()
