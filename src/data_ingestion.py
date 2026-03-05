@@ -186,6 +186,47 @@ class DataIngestion:
         self.df = df_copy
         return self.df
     
+    def handle_rare_categories(self, threshold: int = 5, ignore_cols: list = None) -> pd.DataFrame:
+        """
+        Group rare categories (count < threshold) as 'Other' to handle unseen categories.
+        
+        This helps prevent overfitting and gracefully handles unknown values in production.
+        
+        Args:
+            threshold: Minimum count to keep a category. Categories with count < threshold
+                      become 'Other'
+            ignore_cols: List of column names to skip (e.g., ['CustomerId', 'RowNumber'])
+        
+        Returns:
+            DataFrame with rare categories grouped
+        """
+        if self.df is None:
+            raise ValueError("Data not loaded. Call load_data() first.")
+        
+        if ignore_cols is None:
+            ignore_cols = ['RowNumber', 'CustomerId', 'Surname']
+        
+        df_copy = self.df.copy()
+        categorical_cols = df_copy.select_dtypes(include=['object', 'category']).columns.tolist()
+        categorical_cols = [col for col in categorical_cols if col not in ignore_cols]
+        
+        print(f"Handling rare categories (threshold: {threshold}):")
+        
+        for col in categorical_cols:
+            value_counts = df_copy[col].value_counts()
+            rare_values = value_counts[value_counts < threshold].index.tolist()
+            
+            if rare_values:
+                print(f"  {col}: Found {len(rare_values)} rare categories")
+                print(f"    Rare values: {rare_values}")
+                df_copy[col] = df_copy[col].replace(rare_values, 'Other')
+                print(f"    Replaced with 'Other'")
+            else:
+                print(f"  {col}: No rare categories found")
+        
+        self.df = df_copy
+        return self.df
+    
     def get_data(self) -> pd.DataFrame:
         """
         Get the current dataframe.
@@ -200,16 +241,19 @@ def load_and_validate(data_path: str) -> pd.DataFrame:
     """
     Load and validate data in one function.
     
+    This includes: loading, validation, handling missing values, and grouping rare categories.
+    
     Args:
         data_path: Path to the CSV file
         
     Returns:
-        Validated DataFrame
+        Validated DataFrame with preprocessing applied
     """
     ingestion = DataIngestion(data_path)
     ingestion.load_data()
     ingestion.validate_data()
     ingestion.handle_missing_values(strategy='best')
+    ingestion.handle_rare_categories(threshold=5)
     
     return ingestion.get_data()
 
