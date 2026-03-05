@@ -346,7 +346,7 @@ class ModelTrainer:
             class_weight='balanced'  # Make it care about the 20% minority class
         )
         model.fit(X_train, y_train)
-        print("[OK] Done")
+        print("Done")
         return model
     
     def train_random_forest(self, X_train: np.ndarray, y_train: np.ndarray) -> RandomForestClassifier:
@@ -370,7 +370,7 @@ class ModelTrainer:
             n_jobs=-1  # Use all CPU cores
         )
         model.fit(X_train, y_train)
-        print("[OK] Done")
+        print("Done")
         return model
     
     def train_xgboost(self, X_train: np.ndarray, y_train: np.ndarray) -> xgb.XGBClassifier:
@@ -388,12 +388,13 @@ class ModelTrainer:
             n_estimators=100,
             max_depth=7,
             learning_rate=0.1,
+            early_stopping_rounds=10,
             random_state=self.random_state,
             scale_pos_weight=sum(y_train == 0) / sum(y_train == 1),  # Weight minority class
             eval_metric='logloss'
         )
         model.fit(X_train, y_train)
-        print("[OK] Done")
+        print("Done")
         return model
     
     def evaluate_model(self, model: Any, X_val: np.ndarray, y_val: np.ndarray, 
@@ -530,7 +531,7 @@ class ModelTrainer:
         
         with open(path, 'rb') as f:
             self.best_model = pickle.load(f)
-        print(f"[OK] Loaded from {path}")
+        print(f"Loaded from {path}")
     
     def get_feature_importance(self, n_features: int = 20) -> pd.DataFrame:
         """For tree-based models, show which features matter most.
