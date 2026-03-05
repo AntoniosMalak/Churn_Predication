@@ -1,4 +1,4 @@
-# Customer Churn Prediction - Production Ready ML Pipeline
+﻿# Customer Churn Prediction - Production Ready ML Pipeline
 
 ## What This Is
 
@@ -9,11 +9,11 @@ End-to-end machine learning solution for predicting customer churn with producti
 **Performance:** ROC-AUC ~0.85+ with proper cross-validation
 
 **Key Features:**
-- ✅ Prevents data leakage (fit preprocessor ONLY on training data)
-- ✅ Handles class imbalance (4 strategies: class_weight, SMOTE, undersampling, combined)
-- ✅ Flexible evaluation (train/test split, train/val/test, or cross-validation)
-- ✅ Hyperparameter tuning (grid search with cross-validation)
-- ✅ Production-ready code (modular, tested, documented)
+- âœ… Prevents data leakage (fit preprocessor ONLY on training data)
+- âœ… Handles class imbalance (4 strategies: class_weight, SMOTE, undersampling, combined)
+- âœ… Flexible evaluation (train/test split, train/val/test, or cross-validation)
+- âœ… Hyperparameter tuning (grid search with cross-validation)
+- âœ… Production-ready code (modular, tested, documented)
 
 ## Quick Start
 
@@ -30,14 +30,14 @@ python train.py
 **Output:**
 ```
 CHURN PREDICTION PIPELINE
-✓ Data loaded (10,000 samples)
-✓ Features engineered (9 new features)
-✓ Data split: 8,000 train, 2,000 test
-✓ Preprocessor fitted on train data only
-✓ Class imbalance handled: Using class_weight='balanced'
-✓ Best Model: random_forest
-✓ Test ROC-AUC: 0.8536
-✓ Models saved to models/
+âœ“ Data loaded (10,000 samples)
+âœ“ Features engineered (9 new features)
+âœ“ Data split: 8,000 train, 2,000 test
+âœ“ Preprocessor fitted on train data only
+âœ“ Class imbalance handled: Using class_weight='balanced'
+âœ“ Best Model: random_forest
+âœ“ Test ROC-AUC: 0.8536
+âœ“ Models saved to models/
 ```
 
 ### 3. Make predictions
@@ -54,17 +54,17 @@ python src/predict.py --input data/customers_batch.csv --output predictions.csv
 jupyter notebook notebooks/eda.ipynb
 ```
 
-## What's New in Version 2.1
+## Key Capabilities
 
-### 🎯 Class Imbalance Handling
+### ًںژ¯ Class Imbalance Handling
 Datasets with imbalanced classes (80% vs 20%) can bias models. This solution offers 4 strategies:
 
 | Strategy | Use Case | Performance | Speed |
 |----------|----------|-------------|-------|
-| **class_weight** (DEFAULT) | General use, interpretability | ROC-AUC 0.85 | ⚡ Fast |
-| **SMOTE** | Small datasets, few features | ROC-AUC 0.86 | ⏱️ Slow |
-| **Undersampling** | Large majority class | ROC-AUC 0.84 | ⚡ Fast |
-| **Combined** | Balanced approach | ROC-AUC 0.86 | ⏱️ Slow |
+| **class_weight** (DEFAULT) | General use, interpretability | ROC-AUC 0.85 | âڑ، Fast |
+| **SMOTE** | Small datasets, few features | ROC-AUC 0.86 | âڈ±ï¸ڈ Slow |
+| **Undersampling** | Large majority class | ROC-AUC 0.84 | âڑ، Fast |
+| **Combined** | Balanced approach | ROC-AUC 0.86 | âڈ±ï¸ڈ Slow |
 
 ```python
 # Example: Use SMOTE oversampling
@@ -74,7 +74,7 @@ trainer, results = train_pipeline(
 )
 ```
 
-### 📊 Flexible Data Splitting
+### ًں“ٹ Flexible Data Splitting
 Choose your evaluation strategy:
 
 ```python
@@ -85,7 +85,7 @@ trainer, results = train_pipeline(X, y, use_validation=False)
 trainer, results = train_pipeline(X, y, use_validation=True)
 ```
 
-### 🔄 Cross-Validation
+### ًں”„ Cross-Validation
 Robust evaluation using k-fold cross-validation instead of a single validation set:
 
 ```python
@@ -99,7 +99,7 @@ trainer, results = train_pipeline(
 
 **Benefits:** Better performance estimate, uses more data for training, robust to random splits
 
-### 🔍 Hyperparameter Grid Search
+### ًں”چ Hyperparameter Grid Search
 Automated hyperparameter tuning:
 
 ```python
@@ -119,7 +119,7 @@ trainer, results = train_pipeline(
 )
 ```
 
-### 📁 New Documentation
+### ًں“پ New Documentation
 
 - **`preprocessing_strategy.md`** - Comprehensive guide:
   - Why preprocessing happens AFTER split (data leakage prevention)
@@ -128,7 +128,7 @@ trainer, results = train_pipeline(
   - Feature engineering rationale
   - Complete pipeline flow
 
-- **`CHANGES.md`** - Version 2.1 changelog:
+- **`CHANGES.md`** - Changelog:
   - Detailed explanation of all new features
   - Migration guide
   - Examples and use cases
@@ -146,31 +146,31 @@ trainer, results = train_pipeline(
 
 ```
 Enpal/
-├── train.py                             # Run this to train (now with many options!)
-├── examples.py                          # 7 usage examples
-├── README.md                            # This file
-├── WRITEUP.md                           # Detailed technical explanation
-├── CHANGES.md                           # What's new in v2.1 ✨
-├── preprocessing_strategy.md            # Deep dive: preprocessing & data leakage
-├── requirements.txt                     # Python dependencies
-│
-├── data/
-│   ├── Churn_Modelling.csv              # Main dataset (10,000 customers)
-│   ├── customer_sample.json             # Example for single prediction
-│   └── customers_batch.csv              # Example for batch predictions
-│
-├── src/
-│   ├── data_ingestion.py                # Load, validate, handle missing values
-│   ├── feature_engineering.py           # Create 9 engineered features
-│   ├── model_training.py                # Train, evaluate, compare models
-│   └── predict.py                       # Make predictions on new data
-│
-├── notebooks/
-│   └── eda.ipynb                        # Exploratory data analysis
-│
-└── models/
-    ├── best_model_random_forest.pkl     # Trained model (created after training)
-    └── preprocessor.pkl                 # Scaler + encoder for preprocessing
+â”œâ”€â”€ train.py                             # Run this to train (now with many options!)
+â”œâ”€â”€ examples.py                          # 7 usage examples
+â”œâ”€â”€ README.md                            # This file
+â”œâ”€â”€ WRITEUP.md                           # Detailed technical explanation
+â”œâ”€â”€ CHANGES.md                           # Changelog
+â”œâ”€â”€ preprocessing_strategy.md            # Deep dive: preprocessing & data leakage
+â”œâ”€â”€ requirements.txt                     # Python dependencies
+â”‚
+â”œâ”€â”€ data/
+â”‚   â”œâ”€â”€ Churn_Modelling.csv              # Main dataset (10,000 customers)
+â”‚   â”œâ”€â”€ customer_sample.json             # Example for single prediction
+â”‚   â””â”€â”€ customers_batch.csv              # Example for batch predictions
+â”‚
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ data_ingestion.py                # Load, validate, handle missing values
+â”‚   â”œâ”€â”€ feature_engineering.py           # Create 9 engineered features
+â”‚   â”œâ”€â”€ model_training.py                # Train, evaluate, compare models
+â”‚   â””â”€â”€ predict.py                       # Make predictions on new data
+â”‚
+â”œâ”€â”€ notebooks/
+â”‚   â””â”€â”€ eda.ipynb                        # Exploratory data analysis
+â”‚
+â””â”€â”€ models/
+    â”œâ”€â”€ best_model_random_forest.pkl     # Trained model (created after training)
+    â””â”€â”€ preprocessor.pkl                 # Scaler + encoder for preprocessing
 ```
 
 ## Installation
@@ -192,7 +192,7 @@ pip install -r requirements.txt
 
 ### Step 2: Verify installation
 ```bash
-python -c "import pandas, sklearn, xgboost; print('✓ All dependencies OK')"
+python -c "import pandas, sklearn, xgboost; print('âœ“ All dependencies OK')"
 ```
 
 ### Step 3: Check data is in place
@@ -403,20 +403,20 @@ Covers:
 
 ```
 Raw Data (10,000)
-    ↓
+    â†“
 Feature Engineering (no transformations yet)
-    ↓
-SPLIT into Train (8,000) / Test (2,000) ← SPLIT FIRST
-    ↓
-Fit Preprocessor on Train ONLY ← No test data statistics
-    ↓
-Transform Train and Test ← Consistent transformation
-    ↓
-BALANCE Training Data (if enabled) ← After split
-    ↓
-Train Models ← On balanced training data
-    ↓
-Evaluate on Test ← Original distribution test data
+    â†“
+SPLIT into Train (8,000) / Test (2,000) â†گ SPLIT FIRST
+    â†“
+Fit Preprocessor on Train ONLY â†گ No test data statistics
+    â†“
+Transform Train and Test â†گ Consistent transformation
+    â†“
+BALANCE Training Data (if enabled) â†گ After split
+    â†“
+Train Models â†گ On balanced training data
+    â†“
+Evaluate on Test â†گ Original distribution test data
 ```
 
 **Why it matters:** 
@@ -424,7 +424,7 @@ Evaluate on Test ← Original distribution test data
 - Test data is never seen during preprocessing
 - Evaluation is unbiased and valid
 
-→ Read `preprocessing_strategy.md` for complete details
+â†’ Read `preprocessing_strategy.md` for complete details
 
 ---
 
@@ -464,10 +464,10 @@ Evaluate on Test ← Original distribution test data
 #### Option 3: K-Fold Cross-Validation
 ```
 80% Train (8,000) - Split into k folds
-  ├── Fold 1: Train on 7/8, evaluate on 1/8
-  ├── Fold 2: Train on 7/8, evaluate on 1/8
-  ├── ...
-  └── Fold k: Train on 7/8, evaluate on 1/8
+  â”œâ”€â”€ Fold 1: Train on 7/8, evaluate on 1/8
+  â”œâ”€â”€ Fold 2: Train on 7/8, evaluate on 1/8
+  â”œâ”€â”€ ...
+  â””â”€â”€ Fold k: Train on 7/8, evaluate on 1/8
 20% Test (2,000) - Final evaluation
 ```
 
@@ -482,7 +482,7 @@ Evaluate on Test ← Original distribution test data
 
 ### Class Imbalance Handling
 
-**The Problem:** 79.6% active vs 20.4% churned → Model could predict "all active" and get 79.6% accuracy while catching 0% of churners.
+**The Problem:** 79.6% active vs 20.4% churned â†’ Model could predict "all active" and get 79.6% accuracy while catching 0% of churners.
 
 **Built-in Solutions:**
 
@@ -586,8 +586,8 @@ For **imbalanced classification** (20% minority class), different metrics tell d
 | **Accuracy** | (TP + TN) / All | % of correct predictions | Misleading (even 80% "all retain" is 80% acc) |
 | **Precision** | TP / (TP + FP) | Of predicted churners, % actually churn | Minimize wasted discounts |
 | **Recall** | TP / (TP + FN) | Of actual churners, % we catch | Minimize missed retention |
-| **F1-Score** | 2 × (P × R)/(P+R) | Harmonic mean of precision & recall | Balanced metric |
-| **ROC-AUC** | Area under ROC curve | **⭐ PRIMARY METRIC** | Best for imbalanced data |
+| **F1-Score** | 2 أ— (P أ— R)/(P+R) | Harmonic mean of precision & recall | Balanced metric |
+| **ROC-AUC** | Area under ROC curve | **â­گ PRIMARY METRIC** | Best for imbalanced data |
 
 **Why ROC-AUC?**
 - Evaluates across ALL probability thresholds, not just 0.5
@@ -612,7 +612,7 @@ For **imbalanced classification** (20% minority class), different metrics tell d
 | `HasBalance` | Binary | Binary indicator of savings behavior |
 | `HighBalance` | Binary | Top 25% balance indicator (high-value customers) |
 | `ProductEngagement` | Numeric | Products + HasCard + IsActive = engagement proxy |
-| `ActivityIndex` | Numeric | TenureYears × IsActiveMember = long-term engagement |
+| `ActivityIndex` | Numeric | TenureYears أ— IsActiveMember = long-term engagement |
 | `CreditScoreCategory` | Categorical | Ordinal binning (Poor/Fair/Good/VeryGood/Excellent) |
 | `SalaryToBalanceRatio` | Numeric | Financial health (income vs savings) |
 | `ProductsPerTenure` | Numeric | Product adoption rate |
@@ -629,9 +629,9 @@ Three models trained to demonstrate sound ML methodology:
 
 | Model | Type | Interpretability | Speed | Performance | Best For |
 |-------|------|------------------|-------|-------------|----------|
-| **Logistic Regression** | Linear | ⭐⭐⭐ (Full) | ⚡⚡⚡ | ROC-AUC ~0.75 | Baseline, interpretability |
-| **Random Forest** | Tree ensemble | ⭐⭐ (Feature importance) | ⚡⚡ | ROC-AUC ~0.84 | Robustness, non-linearity |
-| **XGBoost** | Gradient boosting | ⭐⭐ (Feature importance) | ⚡ | ROC-AUC ~0.86 | **Production (best balance)** |
+| **Logistic Regression** | Linear | â­گâ­گâ­گ (Full) | âڑ،âڑ،âڑ، | ROC-AUC ~0.75 | Baseline, interpretability |
+| **Random Forest** | Tree ensemble | â­گâ­گ (Feature importance) | âڑ،âڑ، | ROC-AUC ~0.84 | Robustness, non-linearity |
+| **XGBoost** | Gradient boosting | â­گâ­گ (Feature importance) | âڑ، | ROC-AUC ~0.86 | **Production (best balance)** |
 
 **Selection criterion:** Highest ROC-AUC on validation/test set
 
@@ -678,21 +678,21 @@ train_pipeline(
 
 | Strategy | Data Modification | Speed | Performance | Requires imblearn |
 |----------|-------------------|-------|-------------|-------------------|
-| `class_weight` | ✗ No | ⚡⚡⚡ | ⭐⭐⭐ | ✗ No |
-| `smote` | ✓ Yes (add synthetic) | ⏱️ Slow | ⭐⭐⭐ | ✓ Yes |
-| `undersampling` | ✓ Yes (remove rows) | ⚡ Fast | ⭐⭐ | ✗ No |
-| `combined` | ✓ Yes (both) | ⏱️ Slow | ⭐⭐⭐ | ✓ Yes |
+| `class_weight` | âœ— No | âڑ،âڑ،âڑ، | â­گâ­گâ­گ | âœ— No |
+| `smote` | âœ“ Yes (add synthetic) | âڈ±ï¸ڈ Slow | â­گâ­گâ­گ | âœ“ Yes |
+| `undersampling` | âœ“ Yes (remove rows) | âڑ، Fast | â­گâ­گ | âœ— No |
+| `combined` | âœ“ Yes (both) | âڈ±ï¸ڈ Slow | â­گâ­گâ­گ | âœ“ Yes |
 
 ### Configuration Examples
 
 **Example 1: Default (fast, good for exploration)**
 ```python
 trainer, results = train_pipeline(X, y)
-# ✓ Train/test split (80/20)
-# ✓ Class weight handling
-# ✓ No cross-validation
-# ✓ Fixed hyperparameters
-# ⏱️ ~30 seconds
+# âœ“ Train/test split (80/20)
+# âœ“ Class weight handling
+# âœ“ No cross-validation
+# âœ“ Fixed hyperparameters
+# âڈ±ï¸ڈ ~30 seconds
 ```
 
 **Example 2: Robust evaluation (small dataset)**
@@ -702,10 +702,10 @@ trainer, results = train_pipeline(
     use_cross_validation=True,
     cv_folds=5
 )
-# ✓ Train/test split
-# ✓ 5-fold cross-validation for model selection
-# ✓ Class weight handling
-# ⏱️ ~2-3 minutes
+# âœ“ Train/test split
+# âœ“ 5-fold cross-validation for model selection
+# âœ“ Class weight handling
+# âڈ±ï¸ڈ ~2-3 minutes
 ```
 
 **Example 3: Production optimization (best performance)**
@@ -717,10 +717,10 @@ trainer, results = train_pipeline(
     use_grid_search=True,
     cv_folds=3
 )
-# ✓ Train/val/test split
-# ✓ Combined imbalance handling
-# ✓ Grid search with 3-fold CV
-# ⏱️ ~15-20 minutes
+# âœ“ Train/val/test split
+# âœ“ Combined imbalance handling
+# âœ“ Grid search with 3-fold CV
+# âڈ±ï¸ڈ ~15-20 minutes
 # Result: Optimal hyperparameters + best balance
 ```
 
@@ -742,7 +742,7 @@ handler.handle_missing_values(
 
 **How it works:**
 - Numeric features: Calculates mean-median gap
-  - If gap ≤ 10%: Use mean (normal distribution)
+  - If gap â‰¤ 10%: Use mean (normal distribution)
   - If gap > 10%: Use median (has outliers)
 - Categorical features: Fill with mode (most frequent value)
 
@@ -782,9 +782,9 @@ Verified at every pipeline step:
 | Imbalance Handling | AFTER split, ON TRAIN ONLY | No synthesis for test data |
 
 **Pipeline validates:**
-- ✓ Preprocessor fit_data_size == train_size
-- ✓ Test data never seen during fitting
-- ✓ All transformations use train-fitted parameters
+- âœ“ Preprocessor fit_data_size == train_size
+- âœ“ Test data never seen during fitting
+- âœ“ All transformations use train-fitted parameters
 
 ---
 
@@ -797,7 +797,7 @@ Automatic fallback for data quality issues:
 2. Fill missing values (using train statistics)
 3. Encode categorical features (using train mappings)
 4. Scale numeric features (using train parameters)
-5. If any step fails → return informative error
+5. If any step fails â†’ return informative error
 ```
 
 **Result:** Graceful degradation, never silent failures
@@ -817,10 +817,10 @@ python train.py
 ```
 
 **Expected Results (test set):**
-- ROC-AUC: 0.85±0.01
-- F1-Score: 0.61±0.02
-- Precision: 0.62±0.02
-- Recall: 0.60±0.02
+- ROC-AUC: 0.85آ±0.01
+- F1-Score: 0.61آ±0.02
+- Precision: 0.62آ±0.02
+- Recall: 0.60آ±0.02
 
 **Why reproducible:**
 - Fixed random_state in all algorithms
@@ -903,13 +903,13 @@ trainer, results = train_pipeline(
 python src/predict.py --input data/customer.json
 
 # Common mistake - just loading model:
-# ✗ Wrong: trainer.best_model.predict(X)
-# ✓ Right: Use predict.py script (includes preprocessor)
+# âœ— Wrong: trainer.best_model.predict(X)
+# âœ“ Right: Use predict.py script (includes preprocessor)
 ```
 
 ## Common Pitfalls (Avoided Here)
 
-### ✗ Pitfall 1: Fitting Preprocessor Before Split
+### âœ— Pitfall 1: Fitting Preprocessor Before Split
 ```python
 # WRONG: Leaks test data into scaler statistics
 X_scaled = StandardScaler().fit_transform(X)  # Uses ALL data
@@ -922,11 +922,11 @@ X_train_scaled = scaler.transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 ```
 
-→ **This solution:** ✓ Splits first, then fits preprocessor
+â†’ **This solution:** âœ“ Splits first, then fits preprocessor
 
 ---
 
-### ✗ Pitfall 2: Using Accuracy for Imbalanced Data
+### âœ— Pitfall 2: Using Accuracy for Imbalanced Data
 ```python
 # WRONG: 80% accuracy possible with all "active" predictions
 accuracy = (pred_active + pred_retain) / total
@@ -935,11 +935,11 @@ accuracy = (pred_active + pred_retain) / total
 roc_auc = roc_auc_score(y_true, y_pred_proba)
 ```
 
-→ **This solution:** ✓ Uses ROC-AUC as primary metric
+â†’ **This solution:** âœ“ Uses ROC-AUC as primary metric
 
 ---
 
-### ✗ Pitfall 3: Single Train/Test Split
+### âœ— Pitfall 3: Single Train/Test Split
 ```python
 # WRONG: High variance from single split
 model.fit(X_train, y_train)
@@ -949,11 +949,11 @@ score = model.score(X_test, y_test)
 scores = cross_val_score(model, X_train, y_train, cv=5)
 ```
 
-→ **This solution:** ✓ Offers cross-validation option
+â†’ **This solution:** âœ“ Offers cross-validation option
 
 ---
 
-### ✗ Pitfall 4: Hard-coded Hyperparameters
+### âœ— Pitfall 4: Hard-coded Hyperparameters
 ```python
 # WRONG: Arbitrary choices
 model = RandomForest(max_depth=10, n_estimators=100)
@@ -962,11 +962,11 @@ model = RandomForest(max_depth=10, n_estimators=100)
 grid_search = GridSearchCV(model, param_grid, cv=3)
 ```
 
-→ **This solution:** ✓ Includes grid search capability
+â†’ **This solution:** âœ“ Includes grid search capability
 
 ---
 
-### ✗ Pitfall 5: No Error Analysis
+### âœ— Pitfall 5: No Error Analysis
 ```python
 # WRONG: Train once, assume it works
 model.fit(X_train, y_train)
@@ -974,14 +974,14 @@ model.fit(X_train, y_train)
 # RIGHT: Analyze failures, iterate
 analyze_false_positives()
 analyze_false_negatives()
-# →iterate on features, data, model
+# â†’iterate on features, data, model
 ```
 
-→ **This solution:** ✓ EDA notebook for deep analysis
+â†’ **This solution:** âœ“ EDA notebook for deep analysis
 
 ---
 
-### ✗ Pitfall 6: Monolithic Notebook
+### âœ— Pitfall 6: Monolithic Notebook
 ```python
 # WRONG: Single 1000-line notebook
 # Hard to debug, version control, reuse
@@ -993,7 +993,7 @@ analyze_false_negatives()
 # predict.py
 ```
 
-→ **This solution:** ✓ Production-ready modular code
+â†’ **This solution:** âœ“ Production-ready modular code
 
 ## Advanced Usage
 
@@ -1121,7 +1121,7 @@ importances = trainer.best_model.feature_importances_
 |----------|---------|
 | **README.md** | You are here - overview, usage, examples |
 | **WRITEUP.md** | Detailed technical explanation |
-| **CHANGES.md** | What's new in v2.1 |
+| **CHANGES.md** | Project changelog |
 | **preprocessing_strategy.md** | Deep dive: data leakage prevention |
 | **examples.py** | 7 ready-to-run examples |
 
@@ -1247,11 +1247,11 @@ This project uses the Kaggle Churn Modelling dataset. Refer to Kaggle's terms fo
 
 ---
 
-**Current Version:** 2.1  
 **Last Updated:** March 2026  
-**Status:** Production Ready ✅
+**Status:** Production Ready
 
 For detailed questions, refer to:
 - `WRITEUP.md` - Deep technical explanation
 - `preprocessing_strategy.md` - Data handling strategy
-- `CHANGES.md` - Version history
+- `CHANGES.md` - Changelog
+
