@@ -32,7 +32,7 @@ That's it. Go explore the EDA notebook if you want to dig deeper.
 ## Project Structure
 
 ```
-d:\work\Enpal\
+MainFolder
 ├── train.py                     # Run this to train everything
 ├── README.md                    # This file
 ├── WRITEUP.md                   # Detailed explanation (if you need it)
