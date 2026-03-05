@@ -746,7 +746,6 @@ def train_pipeline(X: np.ndarray, y: np.ndarray, model_dir: str = "models", engi
 
 
 if __name__ == "__main__":
-    # Quick test
     from data_ingestion import load_and_validate
     from feature_engineering import prepare_data
     
