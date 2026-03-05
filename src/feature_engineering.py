@@ -5,7 +5,7 @@ Turn raw customer data into features the model can actually learn from.
 
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler, OrdinalEncoder, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 import pickle
@@ -91,7 +91,7 @@ class FeatureEngineer:
         )
         
         new_features = len(df_engineered.columns) - len(df.columns)
-        print(f"✓ Created {new_features} new features")
+        print(f"Created {new_features} new features")
         return df_engineered
     
     def build_preprocessor(self, X: pd.DataFrame):
@@ -111,8 +111,8 @@ class FeatureEngineer:
         self.numeric_features = [col for col in self.numeric_features if col not in columns_to_remove]
         self.categorical_features = [col for col in self.categorical_features if col not in columns_to_remove]
         
-        print(f"📊 {len(self.numeric_features)} numeric features")
-        print(f"🏷️  {len(self.categorical_features)} categorical features")
+        print(f"{len(self.numeric_features)} numeric features")
+        print(f"{len(self.categorical_features)} categorical features")
         
         # Build the transformer
         transformers = []
@@ -121,15 +121,19 @@ class FeatureEngineer:
         if self.numeric_features:
             transformers.append(('num', StandardScaler(), self.numeric_features))
         
-        # Categorical: one-hot encoding (convert to 0/1 columns)
+        # Categorical: ordinal encoding (convert categories to integer codes)
         if self.categorical_features:
-            transformers.append(('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), 
-                               self.categorical_features))
+            transformers.append((
+                'cat',
+                OrdinalEncoder(),
+                # OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1), # un comment if there is a value in test doesn't exist in train after split
+                self.categorical_features
+            ))
         
         self.preprocessor = ColumnTransformer(transformers=transformers)
         self.preprocessor.fit(X)
         
-        print("✓ Ready to transform data!")
+        print("Ready to transform data")
     
     def transform_features(self, X: pd.DataFrame) -> np.ndarray:
         """Apply the preprocessor to new data.
@@ -145,10 +149,10 @@ class FeatureEngineer:
         
         try:
             X_transformed = self.preprocessor.transform(X)
-            print(f"✓ Transformed {X.shape[0]} samples")
+            print(f"Transformed {X.shape[0]} samples")
             return X_transformed
         except Exception as e:
-            print(f"⚠️  Transform error: {e}")
+            print(f"WARNING: Transform error: {e}")
             raise
     
     def get_feature_names(self) -> List[str]:
@@ -166,9 +170,7 @@ class FeatureEngineer:
             feature_names.extend(self.numeric_features)
         
         if self.categorical_features:
-            cat_encoder = self.preprocessor.named_transformers_['cat']
-            for i, category in enumerate(cat_encoder.categories_):
-                feature_names.extend([f"{self.categorical_features[i]}_{cat}" for cat in category])
+            feature_names.extend(self.categorical_features)
         
         self.feature_names = feature_names
         return feature_names
@@ -185,7 +187,7 @@ class FeatureEngineer:
         path = os.path.join(self.model_dir, name)
         with open(path, 'wb') as f:
             pickle.dump(self.preprocessor, f)
-        print(f"✓ Saved to {path}")
+        print(f"Saved to {path}")
     
     def load_preprocessor(self, name: str = "preprocessor.pkl"):
         """Load a previously saved preprocessor.
@@ -199,7 +201,7 @@ class FeatureEngineer:
         
         with open(path, 'rb') as f:
             self.preprocessor = pickle.load(f)
-        print(f"✓ Loaded from {path}")
+        print(f"Loaded from {path}")
     
     def fit_and_transform(self, X: pd.DataFrame) -> np.ndarray:
         """Fit and transform in one shot.
@@ -226,7 +228,7 @@ class FeatureEngineer:
         return df.drop(columns=[col for col in cols_to_drop if col in df.columns])
 
 
-def prepare_data(df: pd.DataFrame, model_dir: str = "models", fit: bool = True) -> Tuple[np.ndarray, np.ndarray, FeatureEngineer]:
+def prepare_data(df: pd.DataFrame, model_dir: str = "models", fit: bool = True) -> Tuple[pd.DataFrame, np.ndarray, FeatureEngineer]:
     """One function to handle all feature preparation.
     
     Args:
@@ -235,7 +237,7 @@ def prepare_data(df: pd.DataFrame, model_dir: str = "models", fit: bool = True) 
         fit: whether to fit (training) or just transform (inference)
         
     Returns:
-        Tuple of (transformed features, target, engineer object)
+        Tuple of (engineered features as DataFrame, target, engineer object)
     """
     engineer = FeatureEngineer(model_dir=model_dir)
     
@@ -247,24 +249,17 @@ def prepare_data(df: pd.DataFrame, model_dir: str = "models", fit: bool = True) 
     X = df_engineered.drop(columns=['Exited'])
     y = df_engineered['Exited'].values
     
-    # Transform
-    if fit:
-        X_transformed = engineer.fit_and_transform(X)
-        engineer.save_preprocessor()
-    else:
-        engineer.load_preprocessor()
-        X_transformed = engineer.transform_features(X)
-    
-    return X_transformed, y, engineer
+    # Return engineered DataFrame (not yet scaled)
+    # Scaling will happen AFTER train/test split in train_pipeline to prevent data leakage
+    return X, y, engineer
 
 
 if __name__ == "__main__":
-    # Quick test
     from data_ingestion import load_and_validate
     
     data_path = Path(__file__).parent.parent / "data" / "Churn_Modelling.csv"
     df = load_and_validate(str(data_path))
     
     X_transformed, y, engineer = prepare_data(df)
-    print(f"\n✓ Final shape: {X_transformed.shape}")
-    print(f"✓ Churn: {y.sum()} out of {len(y)}")
+    print(f"\nFinal shape: {X_transformed.shape}")
+    print(f"Churn: {y.sum()} out of {len(y)}")
