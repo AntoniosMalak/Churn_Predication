@@ -119,7 +119,7 @@ trainer, results = train_pipeline(
 )
 ```
 
-### New Documentation
+### Documentations
 
 - **`preprocessing_strategy.md`** - Comprehensive guide:
   - Why preprocessing happens AFTER split (data leakage prevention)
