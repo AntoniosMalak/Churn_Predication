@@ -2,4 +2,5 @@
 ML_Eng_TakeHome.pdf
 
 # runnig folder
-src\__pycache__
+__pycache__/
+*.pyc
