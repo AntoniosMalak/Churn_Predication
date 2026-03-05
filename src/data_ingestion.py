@@ -1,6 +1,6 @@
 """
-Data ingestion module for churn prediction pipeline.
-Handles loading, validation, and basic preprocessing of raw customer data.
+Data loading and validation for the churn prediction pipeline.
+Basically: Load CSV, check if it looks reasonable, give you a heads up if something's off.
 """
 
 import pandas as pd
@@ -11,34 +11,30 @@ from typing import Tuple, Dict, Any
 
 
 class DataIngestion:
-    """
-    Handles data loading, validation, and initial data quality checks.
-    """
+    """Simple class to load and validate customer data."""
     
     def __init__(self, data_path: str):
-        """
-        Initialize data ingestion.
+        """Set up the data loader.
         
         Args:
-            data_path: Path to the CSV file containing customer churn data
+            data_path: Path to your CSV file with customer data
         """
         self.data_path = data_path
         self.df = None
         self.data_quality_report = {}
     
     def load_data(self) -> pd.DataFrame:
-        """
-        Load data from CSV file.
+        """Load the CSV and make sure it's not broken.
         
         Returns:
-            DataFrame with raw data
+            Your data as a DataFrame
             
         Raises:
-            FileNotFoundError: If data file doesn't exist
-            ValueError: If file is empty or corrupted
+            FileNotFoundError: Oops, file doesn't exist
+            ValueError: File is empty or something's wrong
         """
         if not os.path.exists(self.data_path):
-            raise FileNotFoundError(f"Data file not found: {self.data_path}")
+            raise FileNotFoundError(f"Can't find data file: {self.data_path}")
         
         self.df = pd.read_csv(self.data_path)
         
@@ -79,7 +75,7 @@ class DataIngestion:
         for col, missing_count in report['missing_values'].items():
             missing_pct = (missing_count / len(self.df)) * 100
             if missing_pct > 20:
-                print(f"⚠ WARNING: Column '{col}' has {missing_pct:.1f}% missing values")
+                print(f"WARNING: Column '{col}' has {missing_pct:.1f}% missing values")
         
         return report
     
@@ -143,17 +139,17 @@ class DataIngestion:
             initial_rows = len(df_copy)
             df_copy = df_copy.dropna()
             dropped_rows = initial_rows - len(df_copy)
-            print(f"⚠ Dropped {dropped_rows} rows with missing values")
+            print(f"Dropped {dropped_rows} rows with missing values")
         
         elif strategy == 'mean':
             numeric_cols = df_copy.select_dtypes(include=[np.number]).columns
             df_copy[numeric_cols] = df_copy[numeric_cols].fillna(df_copy[numeric_cols].mean())
-            print(f"✓ Filled numeric columns with mean values")
+            print(f"Filled numeric columns with mean values")
         
         elif strategy == 'median':
             numeric_cols = df_copy.select_dtypes(include=[np.number]).columns
             df_copy[numeric_cols] = df_copy[numeric_cols].fillna(df_copy[numeric_cols].median())
-            print(f"✓ Filled numeric columns with median values")
+            print(f"Filled numeric columns with median values")
         
         self.df = df_copy
         return self.df
@@ -181,7 +177,7 @@ def load_and_validate(data_path: str) -> pd.DataFrame:
     ingestion = DataIngestion(data_path)
     ingestion.load_data()
     ingestion.validate_data()
-    ingestion.handle_missing_values(strategy='drop')
+    ingestion.handle_missing_values(strategy='mean')
     
     return ingestion.get_data()
 

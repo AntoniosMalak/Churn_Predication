@@ -1,9 +1,7 @@
 """
-Main training pipeline script.
-Runs the entire ML pipeline from data ingestion to model training.
-
-Usage:
-    python train.py
+Train the churn prediction model end-to-end.
+Just run this and it'll handle everything: load data → engineer features → train models.
+Grab some coffee while it runs ☕
 """
 
 import sys
@@ -19,51 +17,50 @@ import pandas as pd
 
 
 def main():
-    """Run the complete training pipeline."""
+    """Run the full pipeline. That's it."""
     
-    print("="*60)
-    print("CHURN PREDICTION PIPELINE - END-TO-END TRAINING")
+    print("\n" + "="*60)
+    print("🚀 CHURN PREDICTION PIPELINE - LET'S GO")
     print("="*60)
     
-    # Configuration
+    # Where's the data?
     data_path = Path(__file__).parent / "data" / "Churn_Modelling.csv"
     model_dir = Path(__file__).parent / "models"
     
-    # Step 1: Data Ingestion
+    # Step 1: Load and check the data
     print("\n" + "="*60)
-    print("STEP 1: DATA INGESTION & VALIDATION")
+    print("STEP 1: LOADING DATA")
     print("="*60)
     
     df = load_and_validate(str(data_path))
-    print(f"\n✓ Data successfully loaded and validated")
+    print(f"\n✓ Data loaded successfully")
     
-    # Step 2: Feature Engineering
+    # Step 2: Make features
     print("\n" + "="*60)
-    print("STEP 2: FEATURE ENGINEERING")
+    print("STEP 2: ENGINEERING FEATURES")
     print("="*60)
     
     X, y, engineer = prepare_data(df, model_dir=str(model_dir), fit=True)
-    print(f"\n✓ Feature engineering completed")
-    print(f"  - Final feature shape: {X.shape}")
-    print(f"  - Target distribution: Churned={y.sum()}, Active={len(y)-y.sum()}")
-    print(f"  - Class balance: {y.sum()/len(y)*100:.1f}% churn rate")
+    print(f"\n✓ Features ready to go")
+    print(f"  📊 Shape: {X.shape}")
+    print(f"  🔍 Churn: {y.sum()} out of {len(y)} customers")
     
-    # Step 3: Model Training
+    # Step 3: Train and evaluate
     print("\n" + "="*60)
-    print("STEP 3: MODEL TRAINING & EVALUATION")
+    print("STEP 3: TRAINING MODELS")
     print("="*60)
     
     trainer, test_results = train_pipeline(X, y, model_dir=str(model_dir))
     
-    # Step 4: Summary
+    # All done!
     print("\n" + "="*60)
-    print("TRAINING COMPLETE")
+    print("✅ DONE! Pipeline completed successfully")
     print("="*60)
-    print(f"\nBest Model: {test_results['model_name']}")
-    print(f"Test ROC-AUC: {test_results['roc_auc']:.4f}")
-    print(f"Test F1-Score: {test_results['f1']:.4f}")
-    print(f"\nModel saved to: {model_dir}")
-    print(f"To make predictions: python src/predict.py --input <customer_data.json>")
+    print(f"\n📈 Best Model: {test_results['model_name']}")
+    print(f"🎯 ROC-AUC Score: {test_results['roc_auc']:.4f}")
+    print(f"📊 F1-Score: {test_results['f1']:.4f}")
+    print(f"\n💾 Models saved to: {model_dir}")
+    print(f"🔮 Make predictions: python src/predict.py --input data/customer_sample.json")
     
     return 0
 

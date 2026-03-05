@@ -1,6 +1,6 @@
 """
-Feature engineering module for churn prediction pipeline.
-Transforms raw data into model-ready features with proper handling of edge cases.
+Feature engineering for the churn model.
+Turn raw customer data into features the model can actually learn from.
 """
 
 import pandas as pd
@@ -16,17 +16,13 @@ from typing import Tuple, Dict, List, Any
 
 
 class FeatureEngineer:
-    """
-    Handles feature engineering, transformation, and pipeline management.
-    Supports both fitting and inference modes.
-    """
+    """Takes messy customer data and turns it into something useful for the model."""
     
     def __init__(self, model_dir: str = None):
-        """
-        Initialize feature engineer.
+        """Set up the feature engineer.
         
         Args:
-            model_dir: Directory to save/load preprocessing artifacts
+            model_dir: Where to save the preprocessor for later use
         """
         self.model_dir = model_dir or "models"
         self.preprocessor = None
@@ -36,96 +32,97 @@ class FeatureEngineer:
         self._ensure_model_dir()
     
     def _ensure_model_dir(self):
-        """Ensure model directory exists."""
+        """Make sure the models folder exists."""
         os.makedirs(self.model_dir, exist_ok=True)
     
     def engineer_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Create engineered features from raw data.
+        """Create smart features from the raw data. These help the model learn better.
         
         Args:
-            df: Raw input DataFrame
+            df: Raw customer data
             
         Returns:
-            DataFrame with engineered features
+            Data with new features added
         """
         df_engineered = df.copy()
         
-        # 1. Age groups
+        # Group ages into buckets (instead of using raw age directly)
         df_engineered['AgeGroup'] = pd.cut(df_engineered['Age'], 
                                            bins=[0, 30, 40, 50, 60, 100],
                                            labels=['18-30', '30-40', '40-50', '50-60', '60+'])
         
-        # 2. Tenure groups
+        # Group tenure too (loyalty matters!)
         df_engineered['TenureGroup'] = pd.cut(df_engineered['Tenure'],
                                              bins=[-1, 1, 3, 5, 10],
                                              labels=['<1yr', '1-3yr', '3-5yr', '5+yr'])
         
-        # 3. Balance categorization
+        # Does this customer have money in the bank?
         df_engineered['HasBalance'] = (df_engineered['Balance'] > 0).astype(int)
         df_engineered['HighBalance'] = (df_engineered['Balance'] > df_engineered['Balance'].quantile(0.75)).astype(int)
         
-        # 4. Product engagement score
+        # How engaged is this customer? (number of products + has card + is active)
         df_engineered['ProductEngagement'] = (
             df_engineered['NumOfProducts'] + 
             df_engineered['HasCrCard'] + 
             df_engineered['IsActiveMember']
         )
         
-        # 5. Customer activity index (combines tenure and activity status)
+        # Activity over time (stays active for years = loyal)
         df_engineered['ActivityIndex'] = (
             df_engineered['IsActiveMember'] * df_engineered['Tenure']
         )
         
-        # 6. Credit score category
+        # Credit score quality
         df_engineered['CreditScoreCategory'] = pd.cut(df_engineered['CreditScore'],
                                                      bins=[0, 580, 669, 739, 799, 850],
                                                      labels=['Poor', 'Fair', 'Good', 'VeryGood', 'Excellent'])
         
-        # 7. Salary to balance ratio (safe division)
+        # Financial health (income vs balance)
         df_engineered['SalaryToBalanceRatio'] = np.where(
             df_engineered['Balance'] > 0,
             df_engineered['EstimatedSalary'] / df_engineered['Balance'],
-            df_engineered['EstimatedSalary'] / 1  # Avoid division by zero
+            df_engineered['EstimatedSalary'] / 1
         )
         
-        # 8. Product-per-tenure ratio
+        # How many products per year of tenure
         df_engineered['ProductsPerTenure'] = np.where(
             df_engineered['Tenure'] > 0,
             df_engineered['NumOfProducts'] / df_engineered['Tenure'],
             0
         )
         
-        print(f"✓ Created {len(df_engineered.columns) - len(df.columns)} engineered features")
+        new_features = len(df_engineered.columns) - len(df.columns)
+        print(f"✓ Created {new_features} new features")
         return df_engineered
     
     def build_preprocessor(self, X: pd.DataFrame):
-        """
-        Build preprocessing pipeline (fit on training data).
+        """Build the pipeline that'll transform data consistently every time.
+        
+        This is trained ONLY on the training data - important to avoid cheating!
         
         Args:
             X: Training features
         """
-        # Identify column types
+        # Split features into numeric and categorical
         self.numeric_features = X.select_dtypes(include=[np.number]).columns.tolist()
         self.categorical_features = X.select_dtypes(include=['object', 'category']).columns.tolist()
         
-        # Remove target and ID columns from preprocessing
+        # Remove customer ID columns (not useful for prediction)
         columns_to_remove = ['Exited', 'RowNumber', 'CustomerId', 'Surname']
         self.numeric_features = [col for col in self.numeric_features if col not in columns_to_remove]
         self.categorical_features = [col for col in self.categorical_features if col not in columns_to_remove]
         
-        print(f"Numeric features: {len(self.numeric_features)}")
-        print(f"Categorical features: {len(self.categorical_features)}")
+        print(f"📊 {len(self.numeric_features)} numeric features")
+        print(f"🏷️  {len(self.categorical_features)} categorical features")
         
-        # Build column transformer
+        # Build the transformer
         transformers = []
         
-        # Numeric: standardization
+        # Numeric: standardize (scale to mean 0, std 1)
         if self.numeric_features:
             transformers.append(('num', StandardScaler(), self.numeric_features))
         
-        # Categorical: one-hot encoding with handle_unknown
+        # Categorical: one-hot encoding (convert to 0/1 columns)
         if self.categorical_features:
             transformers.append(('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), 
                                self.categorical_features))
@@ -133,34 +130,30 @@ class FeatureEngineer:
         self.preprocessor = ColumnTransformer(transformers=transformers)
         self.preprocessor.fit(X)
         
-        print("✓ Preprocessor fitted successfully")
+        print("✓ Ready to transform data!")
     
     def transform_features(self, X: pd.DataFrame) -> np.ndarray:
-        """
-        Transform features using fitted preprocessor.
+        """Apply the preprocessor to new data.
         
         Args:
-            X: Features to transform
+            X: New features to transform
             
         Returns:
-            Transformed feature array
+            Transformed data ready for the model
         """
         if self.preprocessor is None:
-            raise ValueError("Preprocessor not fitted. Call build_preprocessor() first.")
+            raise ValueError("Preprocessor not fitted yet. Call build_preprocessor() first.")
         
         try:
             X_transformed = self.preprocessor.transform(X)
-            print(f"✓ Transformed {X.shape[0]} samples to {X_transformed.shape[1]} features")
+            print(f"✓ Transformed {X.shape[0]} samples")
             return X_transformed
         except Exception as e:
-            print(f"⚠ Error during transformation: {e}")
-            print("  Handling unseen categories gracefully...")
-            # This should be handled by OneHotEncoder(handle_unknown='ignore')
-            return self.preprocessor.transform(X)
+            print(f"⚠️  Transform error: {e}")
+            raise
     
     def get_feature_names(self) -> List[str]:
-        """
-        Get names of transformed features.
+        """Get the names of all transformed features.
         
         Returns:
             List of feature names
@@ -170,11 +163,9 @@ class FeatureEngineer:
         
         feature_names = []
         
-        # Get numeric feature names
         if self.numeric_features:
             feature_names.extend(self.numeric_features)
         
-        # Get one-hot encoded feature names
         if self.categorical_features:
             cat_encoder = self.preprocessor.named_transformers_['cat']
             for i, category in enumerate(cat_encoder.categories_):
@@ -184,11 +175,10 @@ class FeatureEngineer:
         return feature_names
     
     def save_preprocessor(self, name: str = "preprocessor.pkl"):
-        """
-        Save preprocessor to disk.
+        """Save the preprocessor so we can use it later.
         
         Args:
-            name: Filename for the preprocessor
+            name: Filename to save as
         """
         if self.preprocessor is None:
             raise ValueError("Preprocessor not fitted.")
@@ -196,75 +186,69 @@ class FeatureEngineer:
         path = os.path.join(self.model_dir, name)
         with open(path, 'wb') as f:
             pickle.dump(self.preprocessor, f)
-        print(f"✓ Saved preprocessor to {path}")
+        print(f"✓ Saved to {path}")
     
     def load_preprocessor(self, name: str = "preprocessor.pkl"):
-        """
-        Load preprocessor from disk.
+        """Load a previously saved preprocessor.
         
         Args:
-            name: Filename of the preprocessor
+            name: Filename to load
         """
         path = os.path.join(self.model_dir, name)
         if not os.path.exists(path):
-            raise FileNotFoundError(f"Preprocessor not found: {path}")
+            raise FileNotFoundError(f"Not found: {path}")
         
         with open(path, 'rb') as f:
             self.preprocessor = pickle.load(f)
-        print(f"✓ Loaded preprocessor from {path}")
+        print(f"✓ Loaded from {path}")
     
     def fit_and_transform(self, X: pd.DataFrame) -> np.ndarray:
-        """
-        Fit preprocessor and transform features in one step.
+        """Fit and transform in one shot.
         
         Args:
             X: Features to fit and transform
             
         Returns:
-            Transformed feature array
+            Transformed data
         """
         self.build_preprocessor(X)
         return self.transform_features(X)
     
     def drop_non_predictive_columns(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Drop columns that shouldn't be used for modeling.
+        """Remove columns that aren't useful for predictions (like customer name).
         
         Args:
-            df: Input DataFrame
+            df: Input data
             
         Returns:
-            DataFrame with non-predictive columns removed
+            Data without the junk columns
         """
         cols_to_drop = ['RowNumber', 'CustomerId', 'Surname']
         return df.drop(columns=[col for col in cols_to_drop if col in df.columns])
 
 
 def prepare_data(df: pd.DataFrame, model_dir: str = "models", fit: bool = True) -> Tuple[np.ndarray, np.ndarray, FeatureEngineer]:
-    """
-    Convenience function to engineer features and prepare data.
+    """One function to handle all feature preparation.
     
     Args:
-        df: Input DataFrame
-        model_dir: Directory for saving preprocessor artifacts
-        fit: Whether to fit preprocessor (True for training, False for inference)
+        df: Raw data
+        model_dir: Where to save/load the preprocessor
+        fit: whether to fit (training) or just transform (inference)
         
     Returns:
-        Tuple of (X_transformed, y, feature_engineer)
+        Tuple of (transformed features, target, engineer object)
     """
     engineer = FeatureEngineer(model_dir=model_dir)
     
-    # Engineer features
+    # Create features
     df_engineered = engineer.engineer_features(df)
-    
-    # Drop non-predictive columns
     df_engineered = engineer.drop_non_predictive_columns(df_engineered)
     
-    # Separate features and target
+    # Split into features and target
     X = df_engineered.drop(columns=['Exited'])
     y = df_engineered['Exited'].values
     
-    # Fit and transform
+    # Transform
     if fit:
         X_transformed = engineer.fit_and_transform(X)
         engineer.save_preprocessor()
@@ -276,12 +260,12 @@ def prepare_data(df: pd.DataFrame, model_dir: str = "models", fit: bool = True) 
 
 
 if __name__ == "__main__":
-    # Example usage
+    # Quick test
     from data_ingestion import load_and_validate
     
     data_path = Path(__file__).parent.parent / "data" / "Churn_Modelling.csv"
     df = load_and_validate(str(data_path))
     
     X_transformed, y, engineer = prepare_data(df)
-    print(f"\nFinal feature shape: {X_transformed.shape}")
-    print(f"Target distribution: {np.bincount(y)}")
+    print(f"\n✓ Final shape: {X_transformed.shape}")
+    print(f"✓ Churn: {y.sum()} out of {len(y)}")
