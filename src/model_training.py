@@ -49,6 +49,61 @@ class ModelTrainer:
         self.X_train_balanced = None
         self.y_train_balanced = None
         os.makedirs(model_dir, exist_ok=True)
+
+    def _calculate_metrics(self, y_true: np.ndarray, y_pred: np.ndarray, y_pred_proba: np.ndarray) -> Dict[str, float]:
+        """Compute standard classification metrics."""
+        return {
+            'accuracy': accuracy_score(y_true, y_pred),
+            'precision': precision_score(y_true, y_pred, zero_division=0),
+            'recall': recall_score(y_true, y_pred, zero_division=0),
+            'f1': f1_score(y_true, y_pred, zero_division=0),
+            'roc_auc': roc_auc_score(y_true, y_pred_proba),
+        }
+
+    def evaluate_split(self, model: Any, X_data: np.ndarray, y_data: np.ndarray,
+                       split_name: str, threshold: float = 0.5) -> Dict[str, float]:
+        """Evaluate a model on one split and print metrics."""
+        y_pred_proba = model.predict_proba(X_data)[:, 1]
+        y_pred = (y_pred_proba >= threshold).astype(int)
+        metrics = self._calculate_metrics(y_data, y_pred, y_pred_proba)
+
+        print(f"\n{split_name}:")
+        print(f"  Accuracy:  {metrics['accuracy']:.4f}")
+        print(f"  Precision: {metrics['precision']:.4f}")
+        print(f"  Recall:    {metrics['recall']:.4f}")
+        print(f"  F1-Score:  {metrics['f1']:.4f}")
+        print(f"  ROC-AUC:   {metrics['roc_auc']:.4f}")
+        return metrics
+
+    def assess_fit_quality(self, train_metrics: Dict[str, float], ref_metrics: Dict[str, float],
+                           ref_name: str) -> Dict[str, Any]:
+        """Assess whether model appears overfit, underfit, or reasonably fit."""
+        roc_gap = train_metrics['roc_auc'] - ref_metrics['roc_auc']
+        f1_gap = train_metrics['f1'] - ref_metrics['f1']
+
+        if train_metrics['roc_auc'] < 0.70 and ref_metrics['roc_auc'] < 0.70:
+            status = "underfitting"
+            reason = "Both train and evaluation ROC-AUC are low."
+        elif roc_gap > 0.05 or f1_gap > 0.08:
+            status = "overfitting"
+            reason = f"Train performance is noticeably higher than {ref_name.lower()}."
+        else:
+            status = "good fit"
+            reason = f"Train and {ref_name.lower()} performance are reasonably close."
+
+        assessment = {
+            'status': status,
+            'reason': reason,
+            'roc_auc_gap': roc_gap,
+            'f1_gap': f1_gap
+        }
+
+        print("\nFIT DIAGNOSIS:")
+        print(f"  Status: {status}")
+        print(f"  Reason: {reason}")
+        print(f"  ROC-AUC gap (Train - {ref_name}): {roc_gap:.4f}")
+        print(f"  F1 gap (Train - {ref_name}): {f1_gap:.4f}")
+        return assessment
     
     def handle_class_imbalance(self, X_train: np.ndarray, y_train: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Apply imbalance handling strategy to training data.
@@ -355,25 +410,7 @@ class ModelTrainer:
         Returns:
             Dict with all the metrics
         """
-        y_pred_proba = model.predict_proba(X_val)[:, 1]
-        y_pred = (y_pred_proba >= threshold).astype(int)
-        
-        metrics = {
-            'accuracy': accuracy_score(y_val, y_pred),
-            'precision': precision_score(y_val, y_pred, zero_division=0),
-            'recall': recall_score(y_val, y_pred, zero_division=0),
-            'f1': f1_score(y_val, y_pred, zero_division=0),
-            'roc_auc': roc_auc_score(y_val, y_pred_proba),
-        }
-        
-        print(f"\n{model_name}:")
-        print(f"  Accuracy:  {metrics['accuracy']:.4f}")
-        print(f"  Precision: {metrics['precision']:.4f}")
-        print(f"  Recall:    {metrics['recall']:.4f}")
-        print(f"  F1-Score:  {metrics['f1']:.4f}")
-        print(f"  ROC-AUC:   {metrics['roc_auc']:.4f}")
-        
-        return metrics
+        return self.evaluate_split(model, X_val, y_val, model_name, threshold=threshold)
     
     def train_and_evaluate_all(self, X_train: np.ndarray, y_train: np.ndarray,
                               X_val: np.ndarray, y_val: np.ndarray) -> Dict[str, Dict[str, float]]:
@@ -733,6 +770,32 @@ def train_pipeline(X: np.ndarray, y: np.ndarray, model_dir: str = "models", engi
     print("STEP 7: FINAL TEST EVALUATION")
     print("="*60)
     test_results = trainer.test_model()
+
+    # Step 8: Best model train-vs-eval diagnostics
+    print("\n" + "="*60)
+    print("STEP 8: FIT CHECK (OVERFITTING / UNDERFITTING)")
+    print("="*60)
+    train_results = trainer.evaluate_split(
+        trainer.best_model, X_train_scaled, y_train, "TRAIN RESULTS (BEST MODEL)"
+    )
+
+    if use_validation and (X_val_scaled is not None) and (y_val is not None):
+        reference_results = trainer.evaluate_split(
+            trainer.best_model, X_val_scaled, y_val, "VALIDATION RESULTS (BEST MODEL)"
+        )
+        fit_assessment = trainer.assess_fit_quality(train_results, reference_results, "Validation")
+    else:
+        reference_results = {
+            'accuracy': test_results['accuracy'],
+            'precision': test_results['precision'],
+            'recall': test_results['recall'],
+            'f1': test_results['f1'],
+            'roc_auc': test_results['roc_auc'],
+        }
+        fit_assessment = trainer.assess_fit_quality(train_results, reference_results, "Test")
+
+    test_results['train_results'] = train_results
+    test_results['fit_assessment'] = fit_assessment
     
     # Save the winner and preprocessor
     print("\n" + "="*60)
