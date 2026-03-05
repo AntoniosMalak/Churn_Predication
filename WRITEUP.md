@@ -71,7 +71,7 @@ Current `train.py` run configuration uses:
 - Winner selected by highest ROC-AUC from configured evaluation step.
 - Final test metrics are printed via `test_model()`.
 
-### 8. Fit diagnosis (new)
+### 8. Fit diagnosis
 After test evaluation, the pipeline now prints:
 - Best-model train metrics
 - Fit diagnosis: `overfitting`, `underfitting`, or `good fit`
