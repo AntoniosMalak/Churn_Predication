@@ -89,9 +89,7 @@ Saved artifacts:
 - `models/best_model_<model_name>.pkl`
 - `models/preprocessor.pkl`
 
-## Latest Recorded Results (from repository)
-
-Note: The following values are taken from `README.md` latest results section.
+## Latest Recorded Results
 
 ### Best model summary
 - Best model: XGBoost
@@ -144,7 +142,3 @@ Outputs to verify:
 - Final test metrics
 - Train metrics + fit diagnosis
 - Saved model and preprocessor artifacts
-
-## Notes
-- This document avoids adding any synthetic or unverified numeric results.
-- If you run a new experiment, update the "Latest Recorded Results" section with that run's actual output.
