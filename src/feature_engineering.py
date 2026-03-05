@@ -5,14 +5,13 @@ Turn raw customer data into features the model can actually learn from.
 
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import StandardScaler, OrdinalEncoder, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder
 import pickle
 import os
 from pathlib import Path
-from typing import Tuple, Dict, List, Any
+from typing import Tuple, List
 
 
 class FeatureEngineer:
