@@ -1,0 +1,15 @@
+{
+  "RowNumber": 1,
+  "CustomerId": 15634602,
+  "Surname": "Smith",
+  "CreditScore": 650,
+  "Geography": "Germany",
+  "Gender": "Female",
+  "Age": 45,
+  "Tenure": 2,
+  "Balance": 50000,
+  "NumOfProducts": 1,
+  "HasCrCard": 1,
+  "IsActiveMember": 0,
+  "EstimatedSalary": 75000
+}

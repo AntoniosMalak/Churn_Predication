@@ -1,0 +1,6 @@
+RowNumber,CustomerId,Surname,CreditScore,Geography,Gender,Age,Tenure,Balance,NumOfProducts,HasCrCard,IsActiveMember,EstimatedSalary
+1,15634602,Smith,650,Germany,Female,45,2,50000,1,1,0,75000
+2,15647311,Johnson,720,France,Male,38,5,125000,2,1,1,92000
+3,15619304,Williams,580,Spain,Female,55,1,0,1,0,0,68000
+4,15701354,Brown,750,France,Male,32,8,200000,3,1,1,115000
+5,15737888,Jones,820,Spain,Female,28,3,75000,2,1,1,88000
