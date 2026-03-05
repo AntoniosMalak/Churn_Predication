@@ -55,7 +55,8 @@ def main():
         use_validation=False,              # Train/test only (no validation split)
         imbalance_strategy='class_weight', # Handle class imbalance with class weights
         use_cross_validation=True,         # cross-validation
-        use_grid_search=False              # grid search
+        use_grid_search=False,             # grid search
+        grid_search_params=None            # Custom hyperparameters dict
     )
     
     # Pipeline complete
