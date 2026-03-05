@@ -518,9 +518,3 @@ for batch in df.groupby(np.arange(len(df))//batch_size):
 ## Contact & Support
 
 For questions about this project, refer to the detailed write-up in `WRITEUP.md`.
-
----
-
-**Last Updated:** March 5, 2026
-**ML Engineer:** AI Assistant
-**Status:** Production Ready
